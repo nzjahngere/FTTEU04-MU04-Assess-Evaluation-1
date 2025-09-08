@@ -22,8 +22,10 @@ public class SeleniumSprintChallenge {
 	public void setup() {
 		
 		driver = new ChromeDriver();
+		
 	}
 		
+	
 	@Test(priority = 1)
 	public void validateElements() throws InterruptedException {
 		
@@ -50,32 +52,35 @@ public class SeleniumSprintChallenge {
 	
 	@Test(priority = 2)
 	public void dynaWid() throws InterruptedException {
+		
 	    driver.get("https://demoqa.com/select-menu");
 	    driver.manage().window().maximize();
 	    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-	    JavascriptExecutor js = (JavascriptExecutor) driver;
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+	    WebElement selectValue = driver.findElement(By.id("withOptGroup"));
+	    selectValue.click();
+
+	    WebElement group1 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@id,'react-select-2-option-0-0') and text()='Group 1, option 1']")));
+	    group1.click();
 
 	    WebElement selectOne = driver.findElement(By.id("selectOne"));
-	    js.executeScript("arguments[0].click();", selectOne);
+	    selectOne.click();
 
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-	    WebElement drOption = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@id,'react-select') and text()='Dr.']")));
-	    js.executeScript("arguments[0].click();", drOption);
+	    WebElement drOption = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@id,'react-select-3-option-0') and text()='Dr.']")));
+	    drOption.click();
 
-	    WebElement selectValue = driver.findElement(By.xpath("//div[@id='withOptGroup']"));
-	    js.executeScript("arguments[0].click();", selectValue);
-
-	    WebElement option = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@id,'react-select') and text()='Group 1, option 1']")));
-	    js.executeScript("arguments[0].click();", option);
-
-	    Thread.sleep(3000);
+	    Thread.sleep(2000);
 	    
-		driver.findElement(By.linkText("Date Picker"));
+	    driver.findElement(By.xpath("//span[text()='Date Picker']")).click();
+	    
+	    Thread.sleep(1000);
 
 	    WebElement datePicker = driver.findElement(By.id("datePickerMonthYearInput"));
 	    datePicker.clear();
 	    datePicker.sendKeys("10/15/2025");
+	    
 	}
 	
 	@Test(priority = 3)
@@ -115,8 +120,10 @@ public class SeleniumSprintChallenge {
 	
 	@AfterMethod
 	public void closeDriver() throws InterruptedException {
+		
 		Thread.sleep(3000);
 		driver.close();
+		
 	}
 
 }
