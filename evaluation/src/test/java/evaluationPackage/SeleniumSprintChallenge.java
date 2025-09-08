@@ -1,9 +1,11 @@
 package evaluationPackage;
 
+import java.io.File;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -105,12 +107,18 @@ public class SeleniumSprintChallenge {
 		String verifyTxt = driver.findElement(By.className("text-success")).getText();
 		Assert.assertTrue(verifyTxt.contains("You selected"));
 		
-		Thread.sleep(3000);
+		Thread.sleep(2000);
 
 		driver.findElement(By.xpath("//span[text()='Frames']")).click();
 		
-		WebElement frame1 = driver.findElement(By.id("frame1"));
-		driver.switchTo().frame(frame1);
+		WebElement iframe = driver.findElement(By.id("frame1"));
+		File srcFile = iframe.getScreenshotAs(OutputType.FILE);
+		File tarloc = new File("C:\\Users\\RKC-Nagaur\\Downloads\\iFrameShot.png");
+		srcFile.renameTo(tarloc);
+		
+		Thread.sleep(2000);
+		
+		driver.switchTo().frame(iframe);
 		
 		String readTxt = driver.findElement(By.xpath("//h1[@id='sampleHeading']")).getText();
 		Assert.assertEquals(readTxt, "This is a sample page");
@@ -121,7 +129,7 @@ public class SeleniumSprintChallenge {
 	@AfterMethod
 	public void closeDriver() throws InterruptedException {
 		
-		Thread.sleep(3000);
+		Thread.sleep(2000);
 		driver.close();
 		
 	}
