@@ -7,7 +7,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -21,10 +22,8 @@ public class SeleniumSprintChallenge {
 	public void setup() {
 		
 		driver = new ChromeDriver();
-		
 	}
 		
-	
 	@Test(priority = 1)
 	public void validateElements() throws InterruptedException {
 		
@@ -33,15 +32,17 @@ public class SeleniumSprintChallenge {
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		
 		driver.findElement(By.id("userName")).sendKeys("demouser");
-		driver.findElement(By.id("userEmail")).sendKeys("demoEmail");
+		driver.findElement(By.id("userEmail")).sendKeys("demoEmail@gmail.com");
 		driver.findElement(By.id("currentAddress")).sendKeys("Bangalore");
 		driver.findElement(By.id("permanentAddress")).sendKeys("Karnataka");
-		driver.findElement(By.id("submit")).click();
+		
+		WebElement submitBtn = driver.findElement(By.id("submit"));
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 		
 		Thread.sleep(3000);
 		
-		driver.findElement(By.linkText("Radio Button")).click();
-		driver.findElement(By.id("impressiveRadio")).click();
+		driver.findElement(By.xpath("//span[text()='Radio Button']")).click();
+		driver.findElement(By.xpath("//label[@for='impressiveRadio']")).click();
 		String actText = driver.findElement(By.className("text-success")).getText();
 		Assert.assertEquals(actText, "Impressive");		
 		
@@ -49,28 +50,32 @@ public class SeleniumSprintChallenge {
 	
 	@Test(priority = 2)
 	public void dynaWid() throws InterruptedException {
-		
-		driver.get("https://demoqa.com/accordian");
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-		
-		JavascriptExecutor js = (JavascriptExecutor)driver;
-		WebElement ele = driver.findElement(By.linkText("Select Menu"));
-		js.executeScript("arguments[0].scrollIntoView()", ele);
-		ele.click();
-		
-		WebElement drp = driver.findElement(By.name("Select Title"));
-		Select drpdwn = new Select(drp);
-		drpdwn.selectByVisibleText("Dr.");
-		
-		Thread.sleep(2000);
-		
-		WebElement drp2 = driver.findElement(By.name("Select Option"));
-		Select drpdwn2 = new Select(drp2);
-		drpdwn2.selectByVisibleText("Group 1, option 1");
-		
-		driver.findElement(By.linkText("Date Picker")).sendKeys("10/15/2025");
-		
+	    driver.get("https://demoqa.com/select-menu");
+	    driver.manage().window().maximize();
+	    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+	    JavascriptExecutor js = (JavascriptExecutor) driver;
+
+	    WebElement selectOne = driver.findElement(By.id("selectOne"));
+	    js.executeScript("arguments[0].click();", selectOne);
+
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+	    WebElement drOption = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@id,'react-select') and text()='Dr.']")));
+	    js.executeScript("arguments[0].click();", drOption);
+
+	    WebElement selectValue = driver.findElement(By.xpath("//div[@id='withOptGroup']"));
+	    js.executeScript("arguments[0].click();", selectValue);
+
+	    WebElement option = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@id,'react-select') and text()='Group 1, option 1']")));
+	    js.executeScript("arguments[0].click();", option);
+
+	    Thread.sleep(3000);
+	    
+		driver.findElement(By.linkText("Date Picker"));
+
+	    WebElement datePicker = driver.findElement(By.id("datePickerMonthYearInput"));
+	    datePicker.clear();
+	    datePicker.sendKeys("10/15/2025");
 	}
 	
 	@Test(priority = 3)
@@ -80,18 +85,24 @@ public class SeleniumSprintChallenge {
 		driver.manage().window().maximize();
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		
-		driver.findElement(By.id("alertButton")).click();
+		WebElement ele = driver.findElement(By.id("alertButton"));
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", ele);
+
 		driver.switchTo().alert().accept();
 		
-		driver.findElement(By.id("confirmButton")).click();
+		WebElement elem = driver.findElement(By.id("confirmButton"));
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elem);
+		Thread.sleep(500); 
+		elem.click();
+		
 		driver.switchTo().alert().dismiss();
 		
 		String verifyTxt = driver.findElement(By.className("text-success")).getText();
-		Assert.assertEquals(verifyTxt, "You selected");
+		Assert.assertTrue(verifyTxt.contains("You selected"));
 		
 		Thread.sleep(3000);
 
-		driver.findElement(By.linkText("Frames")).click();
+		driver.findElement(By.xpath("//span[text()='Frames']")).click();
 		
 		WebElement frame1 = driver.findElement(By.id("frame1"));
 		driver.switchTo().frame(frame1);
